@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Family Adventure</title>
+
+<style>
+:root {
+  --ink: #494365;
+  --purple: #9886e8;
+  --pink: #f7a9c4;
+  --mint: #b9ead8;
+  --yellow: #ffe7a0;
+  --blue: #c4e8fa;
+  --paper: #fffdfb;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Trebuchet MS", Arial, sans-serif;
+  background:
+    radial-gradient(circle at 8% 8%, #ffe0ed 0, transparent 25%),
+    radial-gradient(circle at 90% 25%, #dff4ff 0, transparent 28%),
+    linear-gradient(140deg, #fffaf4, #f5f1ff 55%, #f1fff9);
+  min-height: 100vh;
+}
+
+button, input { font: inherit; }
+button { cursor: pointer; transition: transform .18s, box-shadow .18s; }
+button:hover { transform: translateY(-2px); }
+button:focus-visible, input:focus-visible {
+  outline: 3px solid #6b58c7;
+  outline-offset: 3px;
+}
+button:disabled { cursor: default; opacity: .8; }
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px clamp(14px, 4vw, 40px);
+  background: #ffffffdc;
+  border-bottom: 1px solid #eee7ff;
+}
+
+.brand {
+  font-size: 1.08rem;
+  font-weight: 900;
+  color: #7865ce;
+}
+
+.score-pill {
+  background: #fff0c5;
+  border: 1px solid #ffe2a0;
+  padding: 10px 16px;
+  border-radius: 30px;
+  font-weight: bold;
+}
+
+main {
+  width: min(100% - 24px, 1000px);
+  margin: 24px auto 40px;
+}
+
+.screen { display: none; }
+.screen.active { display: block; animation: appear .35s ease; }
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(9px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero, .panel {
+  background: #ffffffed;
+  border: 2px solid #ffffff;
+  border-radius: 30px;
+  padding: clamp(20px, 5vw, 40px);
+  text-align: center;
+  box-shadow: 0 12px 35px #6c5e9412;
+}
+
+.hero { overflow: hidden; position: relative; }
+
+.hero::before, .hero::after {
+  content: "✦";
+  position: absolute;
+  color: #efc85c;
+  font-size: 2rem;
+}
+.hero::before { left: 7%; top: 10%; }
+.hero::after { right: 8%; top: 25%; }
+
+h1 {
+  color: #806bd3;
+  font-size: clamp(2rem, 6vw, 3.3rem);
+  line-height: 1.15;
+  margin: 12px 0;
+}
+
+h2 {
+  color: #806bd3;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+}
+
+p { line-height: 1.65; }
+
+.arabic {
+  direction: rtl;
+  text-align: center;
+  font-family: Tahoma, Arial, sans-serif;
+  line-height: 1.9;
+}
+
+.hero-art {
+  font-size: clamp(3.5rem, 11vw, 6rem);
+  padding: 10px;
+  animation: float 3.5s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.primary, .secondary, .sound-button {
+  border: 0;
+  border-radius: 25px;
+  padding: 13px 22px;
+  font-weight: bold;
+  margin: 5px;
+}
+
+.primary {
+  color: #fff;
+  background: linear-gradient(120deg, #9a87e9, #e9a2c7);
+  box-shadow: 0 5px 13px #9a87e933;
+}
+
+.secondary {
+  color: #5d507f;
+  background: #fff0c9;
+}
+
+.sound-button {
+  background: #eae5ff;
+  color: #6656b2;
+  padding: 9px 13px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.progress-track {
+  height: 12px;
+  background: #ece7ff;
+  border-radius: 30px;
+  overflow: hidden;
+  margin: 16px 0 22px;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #9b8be9, #f5a5c5, #ffdc88);
+  border-radius: inherit;
+  transition: width .35s;
+}
+
+.family-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.family-card {
+  background: white;
+  border: 2px solid #eee8ff;
+  border-radius: 23px;
+  padding: 16px 7px;
+  text-align: center;
+  box-shadow: 0 5px 15px #6656b20a;
+}
+
+.family-card:nth-child(4n + 1) { background: #fff9fc; }
+.family-card:nth-child(4n + 2) { background: #f8fcff; }
+.family-card:nth-child(4n + 3) { background: #fbfff9; }
+.family-card:nth-child(4n) { background: #fffdf5; }
+
+.family-card .emoji { font-size: 3rem; }
+.family-card h3 { font-size: 1.08rem; margin: 9px 0 3px; }
+.family-card p { margin: 4px 0; font-size: .9rem; color: #77718d; }
+
+.question-emoji {
+  font-size: clamp(4rem, 13vw, 6.2rem);
+  margin: 12px;
+}
+
+.answers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 620px;
+  margin: 20px auto;
+}
+
+.answer {
+  min-height: 60px;
+  padding: 13px 7px;
+  border-radius: 18px;
+  border: 2px solid #e7e0ff;
+  background: #f8f5ff;
+  color: var(--ink);
+  font-weight: bold;
+}
+
+.answer.correct {
+  background: #dcf8eb;
+  border-color: #83d7b4;
+}
+
+.answer.wrong {
+  background: #fff0f1;
+  border-color: #efb3bd;
+}
+
+.reaction {
+  width: min(100%, 450px);
+  min-height: 160px;
+  margin: 15px auto 5px;
+  border-radius: 25px;
+  background: #fff8fc;
+  border: 2px dashed #f0d6ed;
+  padding: 15px;
+}
+
+.reaction-face {
+  display: inline-block;
+  font-size: 3.6rem;
+  line-height: 1.2;
+}
+
+.reaction-face.bounce { animation: bounce .45s ease 2; }
+.reaction-face.wiggle { animation: wiggle .5s ease; }
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  45% { transform: translateY(-9px); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+.feedback {
+  font-weight: bold;
+  min-height: 30px;
+  margin: 8px 0;
+}
+
+.stars {
+  color: #e6ad36;
+  font-size: 1.8rem;
+  letter-spacing: 5px;
+}
+
+.hidden { display: none !important; }
+
+.certificate {
+  position: relative;
+  overflow: hidden;
+  max-width: 760px;
+  margin: 15px auto;
+  padding: 13px;
+  background: linear-gradient(135deg, #fff8ec, #fff, #f8f4ff);
+  border: 3px solid #c3a766;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px #57457718;
+}
+
+.certificate-inner {
+  border: 2px solid #d7c5ed;
+  outline: 1px solid #d8bd76;
+  outline-offset: -9px;
+  border-radius: 7px;
+  padding: clamp(24px, 5vw, 44px) 16px;
+  text-align: center;
+  position: relative;
+}
+
+.certificate-inner::before,
+.certificate-inner::after {
+  content: "✦  ❀  ✦";
+  color: #d3ac5d;
+  font-size: 1.1rem;
+  position: absolute;
+}
+.certificate-inner::before { top: 14px; left: 15px; }
+.certificate-inner::after { bottom: 14px; right: 15px; }
+
+.certificate-crown { font-size: 2.6rem; }
+
+.certificate h1 {
+  color: #8b75ca;
+  font-family: Georgia, serif;
+  font-size: clamp(1.9rem, 5vw, 2.7rem);
+}
+
+.certificate-subtitle {
+  color: #b08c4e;
+  letter-spacing: 2px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.certificate-name {
+  color: #6d5aab;
+  font-family: Georgia, serif;
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  border-bottom: 2px solid #e5d6ad;
+  display: inline-block;
+  min-width: 180px;
+  padding: 5px 15px 9px;
+  overflow-wrap: anywhere;
+}
+
+.name-input {
+  width: min(100%, 340px);
+  border: 2px solid #d8c9f3;
+  border-radius: 14px;
+  padding: 12px;
+  margin: 12px 0;
+  background: white;
+}
+
+.certificate-details {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.certificate-details span { font-weight: bold; }
+
+.certificate-footer {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 25px;
+  font-size: .9rem;
+}
+
+.small-note { font-size: .9rem; color: #89829e; }
+.center { text-align: center; }
+footer { text-align: center; color: #8d86a5; padding: 10px 15px 25px; }
+
+@media (max-width: 700px) {
+  .family-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero, .panel { border-radius: 23px; }
+}
+
+@media (max-width: 380px) {
+  .answers { gap: 7px; }
+  .answer { font-size: .9rem; }
+  .family-card .emoji { font-size: 2.5rem; }
+  .family-card h3 { font-size: .98rem; }
+}
+
+@media print {
+  @page { size: A4 portrait; margin: 12mm; }
+  body { background: white !important; }
+  header, footer, main > .screen:not(#certificateScreen) { display: none !important; }
+  main { width: 100%; margin: 0; }
+  #certificateScreen { display: block !important; }
+  .no-print { display: none !important; }
+  .certificate {
+    box-shadow: none;
+    max-width: 100%;
+    margin: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="brand">🌈 My Family Adventure</div>
+  <div class="score-pill">⭐ Stars: <span id="score">0</span></div>
+</header>
+
+<main>
+  <!-- HOME -->
+  <section id="homeScreen" class="screen active">
+    <div class="hero">
+      <div class="hero-art">👨‍👩‍👧‍👦 🏡 🌷</div>
+      <p class="certificate-subtitle">A Little Learning Adventure</p>
+      <h1>My Family Adventure!</h1>
+      <h2>Let's learn about family!</h2>
+      <p class="arabic">
+        أهلًا يا بطل! 💗<br>
+        يلا نتعلم أسماء أفراد العائلة بالإنجليزي،
+        ونلعب ونكسب نجوم.
+      </p>
+      <button class="primary" onclick="beginAdventure()">🚀 Start Adventure</button>
+      <p class="small-note">Learn • Play • Smile • Shine</p>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <h2>🎈 Our Little Plan</h2>
+      <p>📚 Learn the words → 🎯 Play the quiz → 🏆 Take the challenge → 🎓 Get your certificate</p>
+      <button class="secondary" onclick="toggleSound()" id="soundToggle">🔉 Sound: On</button>
+      <p class="small-note">الأصوات هادئة، وتقدري توقفيها في أي وقت.</p>
+    </div>
+  </section>
+
+  <!-- LEARN -->
+  <section id="learnScreen" class="screen">
+    <div class="toolbar">
+      <h2>👨‍👩‍👧 Meet the Family!</h2>
+      <button class="secondary" onclick="showScreen('homeScreen')">🏠 Home</button>
+    </div>
+    <p class="arabic">اضغط على Listen علشان تسمع الكلمة بهدوء، وكررها بصوتك.</p>
+    <div class="progress-track"><div id="learnProgress" class="progress-fill"></div></div>
+    <div id="familyGrid" class="family-grid"></div>
+    <div class="center" style="margin-top:24px">
+      <button class="primary" onclick="startQuiz()">🎮 Let's Play!</button>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quizScreen" class="screen">
+    <div class="toolbar">
+      <h2 id="quizHeading">🎯 Family Quiz</h2>
+      <button class="secondary" onclick="showScreen('learnScreen')">📚 Learn</button>
+    </div>
+    <div class="progress-track"><div id="quizProgress" class="progress-fill"></div></div>
+    <div class="panel">
+      <p id="questionCount">Question 1</p>
+      <h2>Who is this?</h2>
+      <div id="questionEmoji" class="question-emoji">👨</div>
+      <p id="questionArabic" class="arabic">مين ده؟</p>
+      <button class="sound-button" onclick="speakCurrentWord()">🔊 Listen</button>
+      <div id="answers" class="answers"></div>
+
+      <div id="reaction" class="reaction hidden" aria-live="polite">
+        <div id="reactionFace" class="reaction-face">😊</div>
+        <p id="feedback" class="feedback"></p>
+        <p id="feedbackArabic" class="arabic"></p>
+      </div>
+
+      <button id="nextQuestionBtn" class="primary hidden" onclick="nextQuestion()">Next ➜</button>
+    </div>
+  </section>
+
+  <!-- CHALLENGE INTRO -->
+  <section id="challengeScreen" class="screen">
+    <div class="panel">
+      <div class="hero-art">🦊 ⭐ 🐻</div>
+      <h1>Super Family Challenge!</h1>
+      <p class="arabic">
+        برافو عليك! خلصت الجولة الأولى.<br>
+        دلوقتي عندك 5 أسئلة جديدة. خُد وقتك وفكّر بهدوء.
+      </p>
+      <p>Each correct answer earns 10 stars!</p>
+      <button class="primary" onclick="startChallenge()">💪 I'm Ready!</button>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="resultScreen" class="screen">
+    <div class="panel">
+      <div id="resultEmoji" class="hero-art">🏆</div>
+      <h1 id="resultTitle">Amazing Job!</h1>
+      <p id="resultMessage" class="arabic"></p>
+      <div id="resultStars" class="stars">⭐⭐⭐⭐⭐</div>
+      <p>Correct answers: <strong id="resultCorrect">0</strong></p>
+      <p>Total stars collected: <strong id="finalScore">0</strong></p>
+      <button class="primary" onclick="showCertificate()">🏅 Get My Certificate</button>
+      <button class="secondary" onclick="beginAdventure()">🔄 Play Again</button>
+    </div>
+  </section>
+
+  <!-- CERTIFICATE -->
+  <section id="certificateScreen" class="screen">
+    <div class="certificate">
+      <div class="certificate-inner">
+        <div class="certificate-crown">👑</div>
+        <p class="certificate-subtitle">Little Learner Award</p>
+        <h1>Certificate of Achievement</h1>
+        <p class="arabic">تُمنح هذه الشهادة بكل فخر إلى البطل / البطلة</p>
+        <input id="childName" class="name-input no-print" type="text"
+          maxlength="45" placeholder="اكتب اسم الطفل هنا" aria-label="Child's name">
+        <div id="certificateName" class="certificate-name">Super Star</div>
+        <p class="arabic">
+          لإتمام مغامرة تعلم أفراد العائلة باللغة الإنجليزية.<br>
+          استمر في التعلّم، فأنت نجم مميز!
+        </p>
+        <div class="stars">✦ ⭐ ✦ ⭐ ✦</div>
+        <h2 style="color:#b18a48">Wonderful Work!</h2>
+        <div class="certificate-details">
+          <div>⭐ Score: <span id="certificateScore">0</span></div>
+          <div>🎯 Correct: <span id="certificateCorrect">0</span></div>
+        </div>
+        <div class="certificate-footer">
+          <div>📅 Date: <span id="certificateDate"></span></div>
+          <div>🌈 My Family Adventure</div>
+        </div>
+      </div>
+    </div>
+    <div class="center no-print">
+      <button class="primary" onclick="printCertificate()">🖨️ Print Certificate</button>
+      <button class="secondary" onclick="showScreen('homeScreen')">🏠 Home</button>
+    </div>
+    <p class="small-note center no-print">اختاري Save as PDF من نافذة الطباعة لو عايزة تحتفظي بالشهادة كملف PDF.</p>
+  </section>
+</main>
+
+<footer>Made with 💗 for little learners</footer>
+
+<script>
+"use strict";
+
+const family = [
+  { word: "Father", emoji: "👨", arabic: "أب" },
+  { word: "Mother", emoji: "👩", arabic: "أم" },
+  { word: "Sister", emoji: "👧", arabic: "أخت" },
+  { word: "Brother", emoji: "👦", arabic: "أخ" },
+  { word: "Grandfather", emoji: "👴", arabic: "جد" },
+  { word: "Grandmother", emoji: "👵", arabic: "جدة" },
+  { word: "Cousin", emoji: "🧒", arabic: "ابن أو ابنة العم أو الخال" },
+  { word: "Baby", emoji: "👶", arabic: "طفل رضيع" }
+];
+
+let score = 0;
+let quizQuestions = [];
+let questionIndex = 0;
+let correctAnswers = 0;
+let totalCorrect = 0;
+let answered = false;
+let challengeMode = false;
+let soundEnabled = true;
+let currentWord = "";
+let audioContext = null;
+let clapBuffer = null;
+let activeAudioNodes = [];
+let soundToken = 0;
+
+const $ = id => document.getElementById(id);
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(screen => screen.classList.remove("active"));
+  $(id).classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function updateScore(points) {
+  score += points;
+  $("score").textContent = score;
+}
+
+function beginAdventure() {
+  score = 0;
+  correctAnswers = 0;
+  totalCorrect = 0;
+  questionIndex = 0;
+  challengeMode = false;
+  $("score").textContent = "0";
+  stopAudio();
+  showScreen("learnScreen");
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  $("soundToggle").textContent = soundEnabled ? "🔉 Sound: On" : "🔇 Sound: Off";
+  if (!soundEnabled) stopAudio();
+}
+
+function stopAudio() {
+  soundToken++;
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+
+  activeAudioNodes.forEach(node => {
+    try { node.stop(); } catch (e) {}
+    try { node.disconnect(); } catch (e) {}
+  });
+  activeAudioNodes = [];
+}
+
+function getAudioContext() {
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) return null;
+
+  if (!audioContext) audioContext = new AudioCtx();
+  if (audioContext.state === "suspended") audioContext.resume().catch(() => {});
+  return audioContext;
+}
+
+function speak(word) {
+  if (!soundEnabled || !("speechSynthesis" in window)) return;
+
+  stopAudio();
+  const token = soundToken;
+  const utterance = new SpeechSynthesisUtterance(word);
+  utterance.lang = "en-US";
+  utterance.rate = 0.68;
+  utterance.pitch = 1.0;
+  utterance.volume = 0.42;
+
+  utterance.onend = () => {
+    if (token === soundToken) activeAudioNodes = [];
+  };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+function speakCurrentWord() {
+  speak(currentWord);
+}
+
+// Make a soft, short applause-like effect using generated noise.
+// It is intentionally quieter than the spoken word.
+function makeClapBuffer(ctx) {
+  const duration = 0.65;
+  const length = Math.floor(ctx.sampleRate * duration);
+  const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+
+  for (let i = 0; i < length; i++) {
+    const t = i / ctx.sampleRate;
+    let envelope = 0;
+
+    [0.03, 0.13, 0.24, 0.37, 0.48].forEach((start, index) => {
+      const local = t - start;
+      if (local >= 0) {
+        envelope += Math.exp(-local * 34) * (index % 2 ? 0.5 : 0.65);
+      }
+    });
+
+    data[i] = (Math.random() * 2 - 1) * Math.min(envelope, 1) * 0.7;
+  }
+  return buffer;
+}
+
+function playSoftClap() {
+  if (!soundEnabled) return;
+
+  const ctx = getAudioContext();
+  if (!ctx) {
+    playHappyChime();
+    return;
+  }
+
+  stopAudio();
+  try {
+    if (!clapBuffer) clapBuffer = makeClapBuffer(ctx);
+
+    const source = ctx.createBufferSource();
+    const filter = ctx.createBiquadFilter();
+    const gain = ctx.createGain();
+
+    source.buffer = clapBuffer;
+    filter.type = "lowpass";
+    filter.frequency.value = 1500;
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.045, ctx.currentTime + 0.025);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.68);
+
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    activeAudioNodes = [source];
+
+    source.start();
+    source.stop(ctx.currentTime + 0.7);
+  } catch (e) {
+    playHappyChime();
+  }
+}
+
+function playTone(frequency, start, duration, peak, type = "sine") {
+  if (!soundEnabled) return;
+
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = type;
+  osc.frequency.setValueAtTime(frequency, ctx.currentTime + start);
+
+  gain.gain.setValueAtTime(0.0001, ctx.currentTime + start);
+  gain.gain.exponentialRampToValueAtTime(
+    Math.max(peak, 0.0002), ctx.currentTime + start + 0.035
+  );
+  gain.gain.exponentialRampToValueAtTime(
+    0.0001, ctx.currentTime + start + duration
+  );
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  activeAudioNodes.push(osc);
+
+  osc.start(ctx.currentTime + start);
+  osc.stop(ctx.currentTime + start + duration + 0.02);
+}
+
+function playHappyChime() {
+  stopAudio();
+  playTone(660, 0, 0.22, 0.035);
+  playTone(790, 0.18, 0.28, 0.03);
+}
+
+function playGentleOops() {
+  if (!soundEnabled) return;
+  stopAudio();
+  playTone(430, 0, 0.22, 0.018);
+  playTone(350, 0.2, 0.26, 0.014);
+}
+
+function renderFamily() {
+  const grid = $("familyGrid");
+  grid.innerHTML = "";
+
+  family.forEach(person => {
+    const card = document.createElement("article");
+    card.className = "family-card";
+
+    const emoji = document.createElement("div");
+    emoji.className = "emoji";
+    emoji.textContent = person.emoji;
+
+    const title = document.createElement("h3");
+    title.textContent = person.word;
+
+    const translation = document.createElement("p");
+    translation.className = "arabic";
+    translation.textContent = person.arabic;
+
+    const button = document.createElement("button");
+    button.className = "sound-button";
+    button.textContent = "🔊 Listen";
+    button.addEventListener("click", () => speak(person.word));
+
+    card.append(emoji, title, translation, button);
+    grid.appendChild(card);
+  });
+
+  $("learnProgress").style.width = "100%";
+}
+
+function shuffle(array) {
+  const result = [...array];
+
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+function startQuiz() {
+  stopAudio();
+  challengeMode = false;
+  quizQuestions = shuffle(family);
+  questionIndex = 0;
+  correctAnswers = 0;
+  $("quizHeading").textContent = "🎯 Family Quiz";
+  showScreen("quizScreen");
+  renderQuestion();
+}
+
+function startChallenge() {
+  stopAudio();
+  challengeMode = true;
+  quizQuestions = shuffle(family).slice(0, 5);
+  questionIndex = 0;
+  correctAnswers = 0;
+  $("quizHeading").textContent = "🏆 Super Challenge";
+  showScreen("quizScreen");
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const person = quizQuestions[questionIndex];
+  currentWord = person.word;
+
+  $("questionCount").textContent =
+    "Question " + (questionIndex + 1) + " of " + quizQuestions.length;
+  $("questionEmoji").textContent = person.emoji;
+  $("questionArabic").textContent = "اختار اسم فرد العائلة ده بالإنجليزية.";
+  $("quizProgress").style.width =
+    (questionIndex / quizQuestions.length * 100) + "%";
+
+  $("reaction").classList.add("hidden");
+  $("nextQuestionBtn").classList.add("hidden");
+  $("answers").innerHTML = "";
+
+  const wrongOptions = shuffle(family.filter(item => item.word !== person.word)).slice(0, 3);
+  const options = shuffle([person, ...wrongOptions]);
+
+  options.forEach(option => {
+    const button = document.createElement("button");
+    button.className = "answer";
+    button.textContent = option.word;
+
+    button.addEventListener("click", () => {
+      if (answered) return;
+      answered = true;
+
+      const correct = option.word === person.word;
+      const answerButtons = [...$("answers").children];
+
+      answerButtons.forEach(btn => {
+        btn.disabled = true;
+        if (btn.textContent === person.word) btn.classList.add("correct");
+      });
+
+      if (correct) {
+        correctAnswers++;
+        totalCorrect++;
+        updateScore(10);
+        $("reactionFace").textContent = "🥳";
+        $("reactionFace").className = "reaction-face bounce";
+        $("feedback").textContent = "Excellent! 👏";
+        $("feedbackArabic").textContent = "أحسنت! إجابة صحيحة، أنت بطل!";
+        playSoftClap();
+      } else {
+        button.classList.add("wrong");
+        $("reactionFace").textContent = "🤔";
+        $("reactionFace").className = "reaction-face wiggle";
+        $("feedback").textContent = "Oops! Let's try again 💗";
+        $("feedbackArabic").textContent =
+          "ولا يهمك! الإجابة الصحيحة هي " + person.word + ". هنتعلمها سوا!";
+        playGentleOops();
+      }
+
+      $("reaction").classList.remove("hidden");
+      $("nextQuestionBtn").classList.remove("hidden");
+      $("nextQuestionBtn").textContent =
+        questionIndex === quizQuestions.length - 1 ? "Finish Round ✨" : "Next ➜";
+    });
+
+    $("answers").appendChild(button);
+  });
+}
+
+function nextQuestion() {
+  questionIndex++;
+
+  if (questionIndex < quizQuestions.length) {
+    renderQuestion();
+    return;
+  }
+
+  $("quizProgress").style.width = "100%";
+
+  if (!challengeMode) {
+    $("challengeScreen").querySelector(".arabic").innerHTML =
+      "برافو عليك! خلصت الجولة الأولى.<br>دلوقتي عندك 5 أسئلة جديدة. خُد وقتك وفكّر بهدوء.";
+    showScreen("challengeScreen");
+  } else {
+    showResults();
+  }
+}
+
+function showResults() {
+  const total = quizQuestions.length;
+  const percent = Math.round(correctAnswers / total * 100);
+
+  $("finalScore").textContent = score;
+  $("resultCorrect").textContent = correctAnswers + " / " + total;
+  $("resultStars").textContent =
+    percent >= 80 ? "⭐⭐⭐⭐⭐" :
+    percent >= 60 ? "⭐⭐⭐⭐" : "⭐⭐⭐";
+
+  if (percent >= 80) {
+    $("resultEmoji").textContent = "🏆";
+    $("resultTitle").textContent = "Amazing Super Star!";
+    $("resultMessage").textContent =
+      "رائع جدًا! أنت شاطر في تعلّم أسماء أفراد العائلة. فخورين بيك!";
+  } else if (percent >= 60) {
+    $("resultEmoji").textContent = "🌈";
+    $("resultTitle").textContent = "Wonderful Work!";
+    $("resultMessage").textContent =
+      "عمل جميل! راجع الكروت وجرب تاني، كل محاولة بتعلمك حاجة جديدة.";
+  } else {
+    $("resultEmoji").textContent = "💗";
+    $("resultTitle").textContent = "Keep Shining!";
+    $("resultMessage").textContent =
+      "أنت تقدر تعملها! ارجع للكروت التعليمية وخد وقتك وجرب مرة تانية.";
+  }
+
+  showScreen("resultScreen");
+}
+
+function showCertificate() {
+  $("certificateScore").textContent = score;
+  $("certificateCorrect").textContent = totalCorrect;
+  $("certificateDate").textContent = new Date().toLocaleDateString("en-GB");
+  $("certificateName").textContent = $("childName").value.trim() || "Super Star";
+  showScreen("certificateScreen");
+}
+
+$("childName").addEventListener("input", event => {
+  $("certificateName").textContent = event.target.value.trim() || "Super Star";
+});
+
+function printCertificate() {
+  $("certificateScore").textContent = score;
+  $("certificateCorrect").textContent = totalCorrect;
+  $("certificateDate").textContent = new Date().toLocaleDateString("en-GB");
+  $("certificateName").textContent = $("childName").value.trim() || "Super Star";
+  window.print();
+}
+
+renderFamily();
+</script>
+</body>
+</html>
